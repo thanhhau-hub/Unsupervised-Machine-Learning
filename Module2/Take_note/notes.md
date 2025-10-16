@@ -68,5 +68,11 @@ Khoảng cách Jaccard được sử dụng để đo lường sự khác biệt
 *   **Ứng dụng:**
     *   Thường được sử dụng trong phân tích văn bản để so sánh sự tương đồng của các tài liệu dựa trên các từ duy nhất mà chúng chứa.
     *   Hữu ích cho bất kỳ ứng dụng nào liên quan đến các tập hợp, chẳng hạn như phân tích giỏ hàng hoặc xác định các hồ sơ người dùng tương tự dựa trên sở thích của họ.
+    *   Khoảng cách này hữu ích cho văn bản và thường được sử dụng trong việc xuất hiện của từ.
+    *   <img width="1606" height="1044" alt="image" src="https://github.com/user-attachments/assets/2cbb1c56-7de6-48cf-b524-22a8048758e9" />
+    
+    *   Trong trường hợp này, khoảng cách Jaccard sẽ bằng 1 trừ đi phần giá trị được chia sẻ. Cụ thể là lấy giao của hai tập chia cho hợp của chúng. Phần giao này chính là những giá trị chung giữa hai câu, chia cho tổng số giá trị duy nhất trong cả hai câu A và B.
+    *   <img width="1525" height="1147" alt="image" src="https://github.com/user-attachments/assets/6d9f62fc-878f-4a1b-b1bd-174b2a9c7105" />
+
 
 Việc lựa chọn một độ đo khoảng cách phù hợp là rất quan trọng đối với sự thành công của các thuật toán phân cụm và nên dựa trên bản chất của dữ liệu cũng như mục tiêu cụ thể của việc phân tích. Trong một số trường hợp, việc đánh giá thực nghiệm có thể cần thiết để xác định độ đo nào hoạt động tốt nhất.
