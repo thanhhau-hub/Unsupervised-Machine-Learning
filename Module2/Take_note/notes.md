@@ -50,6 +50,8 @@ Khoảng cách Manhattan đo lường khoảng cách giữa hai điểm bằng c
     *   Đặc biệt mạnh mẽ cho việc phân tích văn bản và phân cụm tài liệu. Trong lĩnh vực này, tần suất xuất hiện của từ (độ lớn) có thể khác nhau, nhưng chủ đề (hướng) lại giống nhau.
     *   Ví dụ, một bài báo ngắn và một bài báo dài về cùng một chủ đề sẽ có khoảng cách cosine nhỏ.
     *   Nó có khả năng chống lại lời nguyền số chiều tốt.
+    *   <img width="944" height="613" alt="image" src="https://github.com/user-attachments/assets/989a4023-e16c-4b52-9c8a-0a6ad57197d3" />
+
 
 **4. Khoảng cách Jaccard**
 
