@@ -43,12 +43,14 @@ K-Means rất nhạy cảm với việc lựa chọn các điểm khởi tạo b
 
 ### Công thức
 Xác suất để chọn một điểm làm tâm cụm tiếp theo được tính như sau:
-```latex
+$$
 P(\text{điểm}_i) = \frac{D(\text{điểm}_i)^2}{\sum_{j=1}^{N} D(\text{điểm}_j)^2}
-```
+$$
 Trong đó, $D(\text{điểm}_i)$ là khoảng cách từ điểm *i* đến tâm cụm gần nhất đã được chọn.
 
 ---
+
+<img width="1293" height="847" alt="image" src="https://github.com/user-attachments/assets/722396af-6d1b-48a4-ab28-9c0dedd3d1ac" />
 
 ## Lựa chọn số cụm phù hợp (Chọn K)
 
