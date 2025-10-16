@@ -1,102 +1,73 @@
-#### Đánh đổi Bias-Variance
+### Giảm chiều dữ liệu (Dimensionality Reduction)
 
-Sai số bình phương trung bình (Mean Square Error - MSE) của một mô hình có thể được phân tách thành ba thành phần chính: **Bias bình phương**, **Variance** và **Sai số không thể giảm (Irreducible Error)**. Trong đó, Bias và Variance là hai yếu tố chúng ta có thể kiểm soát thông qua thiết kế mô hình.
+Khi làm việc với dữ liệu, đặc biệt là các bộ dữ liệu lớn, chúng ta thường gặp phải một vấn đề gọi là **"lời nguyền của chiều dữ liệu" (curse of dimensionality)**. Hiện tượng này xảy ra khi số lượng đặc trưng (features) trong dữ liệu quá lớn. Việc có quá nhiều đặc trưng không chỉ làm tăng chi phí tính toán mà còn có thể dẫn đến hiệu suất của mô hình học máy bị suy giảm (ví dụ: mô hình bị quá khớp - overfitting).
 
-1.  **Bias (Độ lệch):**
-    *   **Định nghĩa:** Bias là thước đo mức độ gần của dự đoán trung bình của mô hình so với hàm thực mà chúng ta đang cố gắng mô hình hóa. Nói cách khác, nó thể hiện sự đơn giản hóa mà mô hình của chúng ta tạo ra đối với dữ liệu.
-    *   **Tình trạng:**
-        *   **Bias cao:** Cho thấy mô hình quá đơn giản, không đủ phức tạp để nắm bắt các mối quan hệ cơ bản trong dữ liệu. Đây là tình trạng **underfitting** (mô hình chưa học được).
-        *   **Biểu hiện của Underfitting:** Mô hình hoạt động kém không chỉ trên dữ liệu huấn luyện (training data) mà còn trên dữ liệu kiểm tra (test data). Kết quả trên cả hai tập dữ liệu thường tương tự nhau và đều tệ.
-    *   **Cách cải thiện Bias:** Để giảm bias (giảm underfitting), chúng ta cần làm cho mô hình trở nên phức tạp hơn, linh hoạt hơn để nó có thể học được các mẫu phức tạp hơn trong dữ liệu. Các cách tiếp cận bao gồm:
-        *   **Làm cho mô hình phức tạp hơn:** Chẳng hạn, tăng số lượng cây quyết định trong Random Forest, tăng số lớp hoặc nơ-ron trong mạng nơ-ron.
-        *   **Thêm các số hạng đa thức bậc cao hơn:** Trong hồi quy, thêm các biến `x^2`, `x^3` có thể giúp mô hình nắm bắt các mối quan hệ phi tuyến tính.
-        *   **Thu thập thêm các đặc trưng (features):** Cung cấp thêm thông tin cho mô hình có thể giúp nó hiểu rõ hơn về vấn đề.
-        *   **Sử dụng một mô hình khác mạnh mẽ hơn:** Chuyển sang một loại thuật toán phức tạp hơn nếu mô hình hiện tại quá cơ bản.
+May mắn là trong nhiều trường hợp, dữ liệu có thể được biểu diễn một cách hiệu quả bằng một số lượng chiều (đặc trưng) ít hơn mà vẫn giữ được phần lớn thông tin quan trọng. Có hai phương pháp chính để giảm chiều dữ liệu:
 
-2.  **Variance (Phương sai):**
-    *   **Định nghĩa:** Variance là thước đo mức độ thay đổi của các dự đoán của mô hình khi nó được huấn luyện trên các tập dữ liệu huấn luyện khác nhau (tưởng tượng huấn luyện nhiều mô hình trên các tập con dữ liệu khác nhau và xem dự đoán của chúng thay đổi thế nào). Variance thể hiện độ nhạy của mô hình đối với các biến động nhỏ trong dữ liệu huấn luyện.
-    *   **Tình trạng:**
-        *   **Variance cao:** Cho thấy mô hình quá phức tạp, nó đã học quá chi tiết (thậm chí là nhiễu) từ dữ liệu huấn luyện. Đây là tình trạng **overfitting** (mô hình học thuộc lòng).
-        *   **Biểu hiện của Overfitting:** Mô hình hoạt động rất tốt trên dữ liệu huấn luyện (có thể đạt độ chính xác gần như hoàn hảo), nhưng hiệu suất giảm đáng kể khi áp dụng trên dữ liệu kiểm tra mới.
-    *   **Cách cải thiện Variance:** Để giảm variance (giảm overfitting), chúng ta cần làm cho mô hình trở nên đơn giản hơn hoặc ít nhạy cảm hơn với dữ liệu huấn luyện. Các cách tiếp cận bao gồm:
-        *   **Làm cho mô hình kém phức tạp hơn:** Ví dụ, giảm số hạng đa thức, giảm số lượng lớp/nơ-ron, hoặc giảm độ sâu của cây quyết định.
-        *   **Thu thập thêm dữ liệu huấn luyện:** Với nhiều dữ liệu hơn, mô hình ít có khả năng học thuộc lòng nhiễu từ một số ít mẫu.
-        *   **Giảm số lượng đặc trưng:** Loại bỏ các đặc trưng không liên quan hoặc dư thừa có thể giúp mô hình tập trung vào thông tin quan trọng.
-        *   **Sử dụng Kỹ thuật Regularization (Chính quy hóa):** Đây là một phương pháp rất hiệu quả để kiểm soát độ phức tạp của mô hình và giảm overfitting.
+<img width="803" height="535" alt="image" src="https://github.com/user-attachments/assets/c2396058-fb43-45a5-af28-9cd96c629660" />
 
-#### Kỹ thuật Regularization (Chính quy hóa)
+1.  **Lựa chọn đặc trưng (Feature Selection):** Chọn ra một tập hợp con các đặc trưng "quan trọng" nhất từ bộ đặc trưng ban đầu và loại bỏ các đặc trưng còn lại.
+<img width="794" height="576" alt="image" src="https://github.com/user-attachments/assets/fc5f334d-6b6b-4a31-8eeb-db28475424ce" />
 
-Regularization là một tập hợp các kỹ thuật được sử dụng để ngăn chặn overfitting bằng cách thêm một "hình phạt" vào hàm mất mát (loss function) của mô hình. Hình phạt này khuyến khích mô hình sử dụng các hệ số hồi quy nhỏ hơn, do đó làm cho mô hình đơn giản hơn. Ba kỹ thuật regularization chính được thảo luận là Ridge, LASSO và Elastic Net:
-
-Tuyệt vời! Dưới đây là phần giải thích chi tiết về các kỹ thuật điều chuẩn (regularization) trong hồi quy, được trình bày dưới dạng Markdown, kèm theo một hình ảnh minh họa cho khái niệm này.
+2.  **Trích xuất đặc trưng (Feature Extraction):** Tạo ra các đặc trưng mới bằng cách kết hợp các đặc trưng ban đầu thông qua các phép biến đổi tuyến tính hoặc phi tuyến. Các đặc trưng mới này thường ít hơn về số lượng nhưng cô đọng được nhiều thông tin hơn. **PCA** là một kỹ thuật thuộc nhóm này.
+<img width="809" height="550" alt="image" src="https://github.com/user-attachments/assets/91bc73d5-a595-46cf-b429-aed1a34864a0" />
 
 ---
 
-## Các Kỹ Thuật Điều Chuẩn (Regularization) trong Hồi Quy
+### Phân tích thành phần chính (Principal Component Analysis - PCA)
 
-Regularization là một kỹ thuật quan trọng trong machine learning, được sử dụng để giảm thiểu hiện tượng overfitting bằng cách thêm một "hình phạt" (penalty) vào hàm mất mát (loss function) của mô hình. Điều này giúp mô hình tổng quát hóa tốt hơn trên dữ liệu mới chưa từng thấy.
+**PCA** là một kỹ thuật giảm chiều dữ liệu phổ biến, hoạt động bằng cách tạo ra các đặc trưng mới thông qua việc áp dụng các phép biến đổi tuyến tính trên sự kết hợp của các đặc trưng ban đầu. Các đặc trưng mới này được gọi là **các thành phần chính (principal components)**, và dữ liệu ban đầu sẽ được "chiếu" lên không gian của các thành phần chính này.
 
-### 1. Ridge Regression (L2 Regularization)
+#### Các đặc tính chính của PCA:
 
-**Ý tưởng:** Thêm một hình phạt L2 vào hàm mất mát. Hình phạt này bằng tổng bình phương của các hệ số nhân với một tham số $\lambda$.
+*   **Tuyến tính:** Mỗi thành phần chính là một tổ hợp tuyến tính của các đặc trưng gốc.
+*   **Trực giao (Orthogonal):** Các thành phần chính vuông góc với nhau. Điều này có nghĩa là chúng không tương quan với nhau, mỗi thành phần nắm bắt một phần thông tin độc lập trong dữ liệu.
+*   **Thứ tự quan trọng:** Mức độ quan trọng của mỗi thành phần chính được xác định bởi lượng phương sai (variance) của dữ liệu gốc mà nó giải thích/bảo toàn được.
+    *   Thành phần chính thứ nhất (PC1) được chọn để giải thích được nhiều phương sai nhất.
+    *   Thành phần chính thứ hai (PC2), trực giao với PC1, được chọn để giải thích phần phương sai còn lại lớn nhất, và cứ tiếp tục như vậy.
 
-**Công thức:**
-$$
-\text{Loss} = \sum_{i=1}^n (y_i - \hat{y}_i)^2 + \lambda \sum_{j=1}^p \beta_j^2
-$$
-Trong đó:
-*   $n$: Số lượng điểm dữ liệu.
-*   $p$: Số lượng biến độc lập (features).
-*   $y_i$: Giá trị thực tế của biến phụ thuộc cho điểm dữ liệu $i$.
-*   $\hat{y}_i$: Giá trị dự đoán của biến phụ thuộc cho điểm dữ liệu $i$.
-*   $\beta_j$: Hệ số hồi quy cho biến độc lập $j$.
-*   $\lambda$: Tham số điều chỉnh (regularization parameter), kiểm soát mức độ mạnh mẽ của hình phạt. $\lambda \ge 0$.
+#### Cơ sở toán học: SVD
 
-**Hiệu ứng:**
-*   Giảm giá trị tuyệt đối của các hệ số $\beta_j$, nhưng không bao giờ làm chúng bằng 0 (trừ khi $\lambda \to \infty$).
-*   Giúp giảm overfitting, đặc biệt khi các biến có tương quan cao (đa cộng tuyến). Nó phân tán tác động của các biến tương quan.
+Phép toán **Phân rã giá trị suy biến (Singular Value Decomposition - SVD)** là công cụ toán học cốt lõi giúp PCA tìm ra các thành phần chính. SVD phân rã ma trận dữ liệu ban đầu thành các ma trận thành phần, trong đó có một ma trận đường chéo.
 
-**Khi dùng:** Khi bạn có nhiều biến và muốn duy trì tất cả các biến trong mô hình, hoặc khi bạn nghi ngờ có hiện tượng đa cộng tuyến.
+*   Các giá trị khác không trên đường chéo của ma trận này chính là **giá trị riêng (eigenvalues)**. Độ lớn của giá trị riêng cho biết tầm quan trọng của thành phần chính tương ứng. Giá trị càng lớn, thành phần chính đó càng quan trọng vì nó giải thích được nhiều phương sai hơn.
+*   Các vector tương ứng với các giá trị riêng này là **vector riêng (eigenvectors)**, chính là các thành phần chính (principal components).
 
-### 2. Lasso Regression (L1 Regularization)
-
-**Ý tưởng:** Thêm hình phạt L1 vào hàm mất mát. Hình phạt này bằng tổng giá trị tuyệt đối của các hệ số nhân với một tham số $\lambda$.
-
-**Công thức:**
-$$
-\text{Loss} = \sum_{i=1}^n (y_i - \hat{y}_i)^2 + \lambda \sum_{j=1}^p |\beta_j|
-$$
-Trong đó các ký hiệu tương tự như Ridge Regression.
-
-**Hiệu ứng:**
-*   Một số hệ số $\beta_j$ sẽ bằng 0. Điều này có nghĩa là Lasso tự động thực hiện **chọn lọc biến (feature selection)**, loại bỏ các biến ít quan trọng ra khỏi mô hình.
-*   Giảm overfitting và giúp đơn giản hóa mô hình bằng cách chỉ giữ lại các biến quan trọng nhất.
-
-**Khi dùng:** Khi bạn muốn lọc ra các biến quan trọng từ một tập hợp lớn các biến, hoặc khi bạn muốn có một mô hình dễ giải thích hơn.
-
-### 3. Elastic Net
-
-**Ý tưởng:** Kết hợp cả hình phạt L1 và L2, tức là vừa giảm hệ số vừa chọn lọc biến. Nó sử dụng cả tổng giá trị tuyệt đối và tổng bình phương của các hệ số.
-
-**Công thức:**
-$$
-\text{Loss} = \sum_{i=1}^n (y_i - \hat{y}_i)^2 + \lambda_1 \sum_{j=1}^p |\beta_j| + \lambda_2 \sum_{j=1}^p \beta_j^2
-$$
-Trong đó:
-*   $\lambda_1$: Tham số điều chỉnh cho hình phạt L1.
-*   $\lambda_2$: Tham số điều chỉnh cho hình phạt L2.
-*   Hoặc đôi khi được viết dưới dạng một tham số $\lambda$ và một tham số $\alpha$ để cân bằng giữa L1 và L2:
-    $$
-    \text{Loss} = \sum_{i=1}^n (y_i - \hat{y}_i)^2 + \lambda \left( \alpha \sum_{j=1}^p |\beta_j| + (1-\alpha) \sum_{j=1}^p \beta_j^2 \right)
-    $$
-    với $0 \le \alpha \le 1$. Khi $\alpha = 1$, nó trở thành Lasso; khi $\alpha = 0$, nó trở thành Ridge.
-
-**Hiệu ứng:**
-*   Giữ được ưu điểm của Ridge: giảm overfitting khi có nhiều biến liên quan và giải quyết vấn đề đa cộng tuyến hiệu quả hơn Lasso.
-*   Giữ được ưu điểm của Lasso: thực hiện chọn lọc biến.
-*   Elastic Net đặc biệt hữu ích khi có một nhóm các biến tương quan cao; nó có xu hướng chọn cả nhóm biến đó, trong khi Lasso có thể chỉ chọn một biến ngẫu nhiên từ nhóm.
-
-**Khi dùng:** Khi dữ liệu có nhiều biến và đa cộng tuyến, và bạn muốn vừa chọn biến vừa ổn định các hệ số, tận dụng lợi ích từ cả L1 và L2.
+> **Lưu ý quan trọng:** Việc **chuẩn hóa (scale) dữ liệu** trước khi áp dụng PCA là cực kỳ quan trọng. PCA hoạt động dựa trên phương sai của các đặc trưng. Nếu các đặc trưng có thang đo khác nhau (ví dụ: một đặc trưng từ 0-1, một đặc trưng khác từ 0-1,000,000), đặc trưng có thang đo lớn hơn sẽ lấn át hoàn toàn các đặc trưng khác, dẫn đến kết quả phân tích bị sai lệch. Các phương pháp chuẩn hóa phổ biến là `StandardScaler` hoặc `MinMaxScaler`.
 
 ---
 
+### Cú pháp (Syntax) trong `scikit-learn`
+
+Cú pháp để sử dụng PCA trong thư viện `scikit-learn` rất đơn giản.
+
+**1. Import lớp `PCA`**
+
+```python
+from sklearn.decomposition import PCA
+```
+
+**2. Tạo một thực thể (instance) của lớp**
+
+```python
+# Khởi tạo PCA để giảm dữ liệu xuống còn 3 chiều (3 thành phần chính)
+pca = PCA(n_components=3)
+
+# Hoặc, bạn có thể muốn giữ lại một lượng phương sai nhất định (ví dụ: 95%)
+# pca = PCA(n_components=0.95)
+```
+*   `n_components`: Là tham số quan trọng nhất.
+    *   Nếu là một số nguyên (ví dụ: `3`), nó chỉ định số lượng thành phần chính cần giữ lại.
+    *   Nếu là một số thực trong khoảng (0, 1) (ví dụ: `0.95`), nó sẽ tự động chọn số lượng thành phần chính tối thiểu để giải thích được ít nhất 95% phương sai của dữ liệu.
+
+**3. Huấn luyện (fit) mô hình và biến đổi dữ liệu**
+
+Sử dụng phương thức `fit_transform()` để huấn luyện PCA trên dữ liệu huấn luyện (`X_train`) và đồng thời trả về phiên bản đã được giảm chiều của dữ liệu đó.
+
+```python
+# Giả sử X_train là dữ liệu gốc đã được chuẩn hóa
+# Phương thức này sẽ học các thành phần chính từ X_train và biến đổi X_train
+X_trans = pca.fit_transform(X_train)
+```
+
+Sau bước này, `X_trans` sẽ là phiên bản dữ liệu mới của `X_train` nhưng với số chiều đã được giảm xuống (trong ví dụ này là 3), sẵn sàng để được sử dụng cho các mô hình học máy khác.
