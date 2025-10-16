@@ -1,31 +1,136 @@
-### Tổng quan về Kiểm định chéo (Cross-Validation)
+### Hierarchical Clustering
 
-Kiểm định chéo là một kỹ thuật quan trọng trong học máy, được sử dụng để đánh giá hiệu suất của một mô hình một cách đáng tin cậy hơn so với việc chỉ sử dụng một lần chia dữ liệu duy nhất. Mục tiêu chính là đảm bảo mô hình có thể khái quát hóa tốt trên dữ liệu mới, chưa từng thấy.
+Hierarchical Clustering là một thuật toán học không giám sát dùng để nhóm các đối tượng tương tự vào các nhóm gọi là cụm (clusters). Điểm đặc biệt của thuật toán này là nó xây dựng một cây phân cấp các cụm, được biểu diễn qua một biểu đồ dạng cây gọi là **Dendrogram**. Không giống như các thuật toán khác như K-Means, phân cụm phân cấp không yêu cầu xác định trước số lượng cụm.
 
-**Ba phương pháp kiểm định chéo phổ biến nhất bao gồm:**
+Có hai phương pháp chính trong phân cụm phân cấp:
 
-1.  **K-Fold Cross-Validation:** Phương pháp này chia toàn bộ tập dữ liệu thành `k` phần (hoặc "folds") có kích thước gần bằng nhau. Mô hình sẽ được huấn luyện `k` lần. Trong mỗi lần lặp, một fold được sử dụng làm tập kiểm tra (test set), và `k-1` folds còn lại được dùng làm tập huấn luyện (training set). Kết quả lỗi từ mỗi lần kiểm tra sẽ được tính trung bình để đưa ra một ước lượng hiệu suất tổng thể của mô hình.
+*   **Phân cụm tích tụ (Agglomerative Clustering):** Đây là phương pháp tiếp cận từ dưới lên (bottom-up). Ban đầu, mỗi điểm dữ liệu được coi là một cụm riêng lẻ. Sau đó, thuật toán sẽ liên tục hợp nhất các cặp cụm gần nhau nhất cho đến khi tất cả các điểm được gộp vào một cụm duy nhất.
+*   **Phân cụm phân rã (Divisive Clustering):** Đây là phương pháp tiếp cận từ trên xuống (top-down). Bắt đầu với một cụm lớn chứa tất cả các điểm dữ liệu, thuật toán sẽ liên tục chia nhỏ cụm này thành các cụm nhỏ hơn.
 
-2.  **Leave-One-Out Cross-Validation (LOOCV):** Đây là một trường hợp đặc biệt của K-Fold Cross-Validation, trong đó `k` bằng số lượng hàng (quan sát) trong tập dữ liệu (`n_rows`). Tức là, trong mỗi lần lặp, chỉ một hàng duy nhất được giữ lại làm tập kiểm tra, và `n_rows - 1` hàng còn lại được dùng để huấn luyện mô hình. Phương pháp này cung cấp một ước lượng hiệu suất rất chi tiết nhưng lại tốn kém về mặt tính toán, đặc biệt với các tập dữ liệu lớn.
+Trong thực tế, phương pháp tích tụ (Agglomerative) được sử dụng phổ biến hơn.
 
-3.  **Stratified Cross-Validation:** Phương pháp này thường được sử dụng khi biến mục tiêu (outcome variable) là phân loại và có sự mất cân bằng lớp (ví dụ: 80% True, 20% False). Stratified Cross-Validation đảm bảo rằng tỷ lệ các lớp trong tập huấn luyện và tập kiểm tra của mỗi lần chia dữ liệu (split) sẽ được duy trì gần giống với tỷ lệ lớp trong tập dữ liệu gốc. Điều này giúp tránh tình trạng một fold kiểm tra chỉ chứa các mẫu của một lớp, dẫn đến đánh giá hiệu suất sai lệch.
+<img width="1300" height="795" alt="image" src="https://github.com/user-attachments/assets/644d5ea3-1b74-491b-9109-9015578c4ff9" />
 
-### Phân chia dữ liệu trong Kiểm định chéo
+### Thuật toán Phân cụm Tích tụ (Agglomerative Hierarchical Clustering - HAC)
 
-Mặc dù có nhiều cách để chia dữ liệu, nhưng trong ngữ cảnh của kiểm định chéo, chúng ta thường hình dung việc phân chia dữ liệu thành ba phần chính cho các mục đích khác nhau:
+Thuật toán này hoạt động bằng cách liên tục sáp nhập các cụm mới cho đến khi đạt được một mức độ hội tụ nhất định.
 
-*   **Tập huấn luyện (Training Set):** Đây là phần lớn dữ liệu được sử dụng để "dạy" mô hình, tức là để ước tính các tham số (parameters) của mô hình.
-*   **Tập xác thực (Validation Set):** Phần dữ liệu này được sử dụng để tinh chỉnh và tối ưu hóa các siêu tham số (hyper-parameters) của mô hình. Bằng cách thử nghiệm các tổ hợp siêu tham số khác nhau trên tập xác thực, chúng ta có thể chọn ra cấu hình tốt nhất mà không làm "rò rỉ" thông tin từ tập kiểm tra cuối cùng.
-*   **Tập kiểm tra (Test Set):** Đây là một phần dữ liệu được giữ lại hoàn toàn và chỉ được sử dụng một lần duy nhất vào cuối quá trình phát triển mô hình để đánh giá hiệu suất cuối cùng của mô hình đã được tinh chỉnh. Điều này cung cấp một ước lượng không thiên lệch về khả năng khái quát hóa của mô hình trên dữ liệu thực tế.
+Thuật toán này xác định cặp điểm đầu tiên có khoảng cách nhỏ nhất và biến nó thành cụm đầu tiên, sau đó, cặp điểm thứ hai có khoảng cách nhỏ thứ hai sẽ tạo thành cụm thứ hai, v.v. Vì thuật toán tiếp tục thực hiện điều này với tất cả các cặp điểm gần nhất, nó có thể biến tất cả các điểm thành một cụm duy nhất, đó là lý do tại sao HAC cũng cần một tiêu chí dừng.
 
-### Cú pháp Kiểm định chéo với Scikit-Learn
+### Các loại liên kết (Linkage Methods)
 
-Thư viện Scikit-Learn cung cấp nhiều công cụ mạnh mẽ để thực hiện kiểm định chéo:
+Để đo khoảng cách giữa các cụm, có một số phương pháp hoặc loại liên kết. Dưới đây là những loại phổ biến nhất:
 
-*   **`train_test_split`**: Hàm này tạo một lần chia dữ liệu duy nhất thành tập huấn luyện và tập kiểm tra. Đây là bước cơ bản nhất để bắt đầu đánh giá mô hình.
-*   **`K-fold`**: Đây là một đối tượng (object) cho phép bạn tạo ra các chỉ mục (indices) cho nhiều lần chia K-fold. Nó cung cấp sự linh hoạt để kiểm soát cách chia (ví dụ: `shuffle=True` để xáo trộn dữ liệu trước khi chia).
-*   **`cross_val_score`**: Hàm này đánh giá điểm số (score) của mô hình thông qua kiểm định chéo. Nó tự động thực hiện quá trình chia dữ liệu (dựa trên tham số `cv`), huấn luyện mô hình và tính toán điểm số cho mỗi fold, sau đó trả về một mảng các điểm số.
-*   **`cross_val_predict`**: Thay vì trả về điểm số, hàm này tạo ra các dự đoán "out-of-bag" cho mỗi hàng trong tập dữ liệu gốc. Điều này có nghĩa là mỗi dự đoán cho một hàng cụ thể được tạo ra bởi một mô hình đã được huấn luyện trên các fold mà không bao gồm hàng đó.
-*   **`GridSearchCV`**: Đây là một công cụ mạnh mẽ để tìm kiếm và chọn ra bộ siêu tham số tốt nhất cho mô hình. Nó sẽ thử nghiệm tất cả các tổ hợp siêu tham số được chỉ định trên nhiều lần chia kiểm định chéo và chọn ra bộ siêu tham số có điểm số ngoài mẫu (out-of-sample score) tốt nhất.
-*   **`Pipeline`**: Mặc dù không trực tiếp là một phương pháp kiểm định chéo, `Pipeline` là một công cụ không thể thiếu để xâu chuỗi các bước tiền xử lý dữ liệu và mô hình lại với nhau. Điều này đảm bảo rằng các bước tiền xử lý được áp dụng một cách nhất quán cho cả tập huấn luyện và tập kiểm tra trong mỗi fold của quá trình kiểm định chéo, tránh rò rỉ dữ liệu và làm cho code trở nên gọn gàng hơn.
+#### 1. **Single Linkage** (Liên kết đơn)
 
+*   **Định nghĩa:** Đo khoảng cách giữa hai cụm bằng khoảng cách *nhỏ nhất* giữa hai điểm bất kỳ thuộc hai cụm đó (một điểm thuộc cụm này và một điểm thuộc cụm kia).
+*   **Công thức:**
+    $D(C_1, C_2) = \min_{x \in C_1, y \in C_2} d(x, y)$
+    Trong đó $d(x, y)$ là khoảng cách giữa hai điểm x và y.
+*   **Ưu điểm:** Giúp đảm bảo sự tách biệt rõ ràng giữa các cụm.
+*   **Nhược điểm:** Không thể phân tách rõ ràng nếu có nhiễu giữa hai cụm khác nhau.
+
+#### 2. **Complete Linkage** (Liên kết hoàn chỉnh)
+
+*   **Định nghĩa:** Thay vì lấy khoảng cách nhỏ nhất, phương pháp này sẽ lấy khoảng cách *lớn nhất* giữa hai điểm bất kỳ thuộc hai cụm.
+*   **Công thức:**
+    $D(C_1, C_2) = \max_{x \in C_1, y \in C_2} d(x, y)$
+*   **Ưu điểm:** Hoạt động tốt hơn trong việc phân tách các cụm khi có nhiễu hoặc các điểm chồng chéo.
+*   **Nhược điểm:** Có xu hướng phá vỡ các cụm lớn hiện có.
+
+#### 3. **Average Linkage** (Liên kết trung bình)
+
+*   **Định nghĩa:** Tính khoảng cách trung bình của tất cả các cặp điểm giữa hai cụm.
+*   **Công thức:**
+    $D(C_1, C_2) = \frac{1}{|C_1| |C_2|} \sum_{x \in C_1} \sum_{y \in C_2} d(x, y)$
+*   **Ưu điểm:** Tương tự như Single và Complete linkage.
+*   **Nhược điểm:** Cũng có xu hướng phá vỡ các cụm lớn.
+
+#### 4. **Ward's Linkage** (Liên kết Ward)
+
+*   **Định nghĩa:** Hợp nhất hai cụm sao cho sự gia tăng tổng phương sai trong cụm (within-cluster variance) là nhỏ nhất. Phương pháp này cố gắng tạo ra các cụm có kích thước tương đối bằng nhau.
+*   **Công thức:**
+    $\Delta(C_1, C_2) = \frac{|C_1| |C_2|}{|C_1| + |C_2|} ||\mu_1 - \mu_2||^2$
+    Trong đó $\mu_1$ và $\mu_2$ là tâm (centroid) của các cụm $C_1$ và $C_2$.
+*   **Ưu điểm:** Thường tạo ra các cụm nhỏ gọn và có kích thước đồng đều.
+*   **Nhược điểm:** Nhạy cảm với các điểm ngoại lai (outliers) và chỉ hoạt động tốt với không gian Euclidean.
+
+### Cú pháp cho Agglomerative Clustering trong `scikit-learn`
+
+Để triển khai thuật toán này trong Python, chúng ta có thể sử dụng thư viện `scikit-learn`.
+
+**1. Import `AgglomerativeClustering`**
+
+```python
+from sklearn.cluster import AgglomerativeClustering
+```
+
+**2. Tạo một thực thể (instance) của lớp**
+
+```python
+# Khởi tạo mô hình với 3 cụm, sử dụng khoảng cách euclidean và phương pháp liên kết 'ward'
+agg = AgglomerativeClustering(n_clusters=3, affinity='euclidean', linkage='ward')
+```
+
+*   `n_clusters`: Số lượng cụm cần tìm.
+*   `affinity`: Phương thức đo khoảng cách. Mặc định là 'euclidean'. Các giá trị khác có thể là 'l1', 'l2', 'manhattan', 'cosine'.
+*   `linkage`: Phương pháp liên kết. Có thể là 'ward', 'complete', 'average', 'single'.
+
+**3. Huấn luyện mô hình và dự đoán**
+
+```python
+# Huấn luyện mô hình trên dữ liệu X1
+agg.fit(X1)
+
+# Dự đoán cụm cho dữ liệu mới X2
+y_predict = agg.fit_predict(X2)
+```
+Hoặc có thể kết hợp cả hai bước `fit` và `predict` bằng `fit_predict`:```python
+# Huấn luyện mô hình và trả về nhãn cụm cho dữ liệu X1
+
+Phương thức này sẽ thực hiện hai bước trong một lệnh duy nhất:
+1.  **`fit(X1)`**: Huấn luyện mô hình phân cụm trên dữ liệu `X1`.
+2.  **`predict(X1)`**: Gán nhãn cụm cho từng điểm dữ liệu trong `X1` dựa trên mô hình vừa được huấn luyện.
+
+###Ví dụ
+
+Giả sử bạn đã có dữ liệu `X1`. Cách huấn luyện mô hình và lấy nhãn cụm.
+
+```python
+# Import các thư viện cần thiết
+import numpy as np
+from sklearn.cluster import AgglomerativeClustering
+import matplotlib.pyplot as plt
+
+# 1. Tạo dữ liệu mẫu (hoặc sử dụng dữ liệu X1 của bạn)
+# Ở đây, chúng ta tạo 150 điểm dữ liệu chia thành 3 nhóm
+from sklearn.datasets import make_blobs
+X1, y_true = make_blobs(n_samples=150, centers=3, cluster_std=0.90, random_state=42)
+
+# 2. Khởi tạo mô hình AgglomerativeClustering
+# Chúng ta sẽ tìm 3 cụm, sử dụng khoảng cách Euclidean và phương pháp liên kết 'ward'
+# 'ward' là một lựa chọn phổ biến vì nó cố gắng giảm thiểu phương sai trong mỗi cụm
+agg_model = AgglomerativeClustering(n_clusters=3, affinity='euclidean', linkage='ward')
+
+# 3. Huấn luyện mô hình và trả về nhãn cụm cho dữ liệu X1
+# Phương thức fit_predict() sẽ thực hiện cả hai công việc cùng lúc
+cluster_labels = agg_model.fit_predict(X1)
+
+# 4. In ra các nhãn cụm đã được gán cho 10 điểm dữ liệu đầu tiên
+print("Dữ liệu X1 (10 điểm đầu tiên):")
+print(X1[:10])
+print("\nNhãn cụm tương ứng (10 nhãn đầu tiên):")
+print(cluster_labels[:10])
+
+# (Tùy chọn) 5. Trực quan hóa kết quả
+plt.figure(figsize=(8, 6))
+# Vẽ các điểm dữ liệu, tô màu theo nhãn cụm đã dự đoán
+scatter = plt.scatter(X1[:, 0], X1[:, 1], c=cluster_labels, cmap='viridis')
+plt.title('Kết quả phân cụm bằng Agglomerative Clustering')
+plt.xlabel('Đặc trưng 1')
+plt.ylabel('Đặc trưng 2')
+plt.legend(handles=scatter.legend_elements()[0], labels=['Cụm 0', 'Cụm 1', 'Cụm 2'])
+plt.grid(True)
+plt.show()
+
+```
