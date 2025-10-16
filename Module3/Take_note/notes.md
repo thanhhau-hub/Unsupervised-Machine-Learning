@@ -92,7 +92,7 @@ Phương thức này sẽ thực hiện hai bước trong một lệnh duy nhấ
 1.  **`fit(X1)`**: Huấn luyện mô hình phân cụm trên dữ liệu `X1`.
 2.  **`predict(X1)`**: Gán nhãn cụm cho từng điểm dữ liệu trong `X1` dựa trên mô hình vừa được huấn luyện.
 
-###Ví dụ
+### Ví dụ
 
 Giả sử bạn đã có dữ liệu `X1`. Cách huấn luyện mô hình và lấy nhãn cụm.
 
