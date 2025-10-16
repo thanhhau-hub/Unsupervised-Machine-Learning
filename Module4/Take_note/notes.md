@@ -11,7 +11,9 @@ May mắn là trong nhiều trường hợp, dữ liệu có thể được bi�
 ### Phân tích thành phần chính (Principal Component Analysis - PCA)
 
 **PCA** là một kỹ thuật giảm chiều dữ liệu phổ biến, hoạt động bằng cách tạo ra các đặc trưng mới thông qua việc áp dụng các phép biến đổi tuyến tính trên sự kết hợp của các đặc trưng ban đầu. Các đặc trưng mới này được gọi là **các thành phần chính (principal components)**, và dữ liệu ban đầu sẽ được "chiếu" lên không gian của các thành phần chính này.
-<img width="1305" height="789" alt="image" src="https://github.com/user-attachments/assets/298c209f-12ac-4fb7-83af-d2df2955190e" />
+
+<img width="1288" height="781" alt="image" src="https://github.com/user-attachments/assets/a4255929-4465-4e9d-8809-23f88611ed16" />
+
 #### Các đặc tính chính của PCA:
 
 *   **Tuyến tính:** Mỗi thành phần chính là một tổ hợp tuyến tính của các đặc trưng gốc.
