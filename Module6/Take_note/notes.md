@@ -1,56 +1,116 @@
-###  Các Kỹ thuật Regularization
+### Non-Negative Matrix Factorization - NMF
 
-Để xây dựng một mô hình học máy hiệu quả, chúng ta phải đối mặt với ba nguồn sai số chính: **bias (độ lệch)**, **variance (phương sai)** và **irreducible error (sai số không thể giảm)**. Sai số không thể giảm là nhiễu vốn có trong dữ liệu mà không mô hình nào có thể loại bỏ. Tuy nhiên, bias và variance là hai thành phần mà chúng ta có thể tối ưu hóa thông qua việc thiết kế và huấn luyện mô hình.
+**Phân rã Ma trận không âm (NMF)** là một kỹ thuật khác để giảm chiều dữ liệu. Tương tự như PCA, đây cũng là một phương pháp phân rã ma trận có dạng **V ≈ W x H**.
 
-**Regularization (Chính quy hóa)** là một kỹ thuật mạnh mẽ và thiết yếu trong học máy, đặc biệt là trong các mô hình hồi quy và mạng nơ-ron, nhằm đạt được mục tiêu xây dựng các mô hình đơn giản hơn nhưng với sai số tương đối thấp. Mục tiêu chính của regularization là **tránh hiện tượng overfitting (quá khớp)** bằng cách đưa một "hình phạt" vào hàm mất mát (cost function) của mô hình. Hình phạt này khuyến khích mô hình sử dụng các hệ số (coefficients) có giá trị nhỏ hơn, từ đó giảm độ phức tạp của mô hình và "thu nhỏ" kích thước của nó (shrinks the model).
+Điểm khác biệt chính so với các phương pháp khác như PCA là NMF **chỉ có thể được áp dụng cho các ma trận có giá trị đầu vào không âm (lớn hơn hoặc bằng 0)**. Ví dụ:
 
-#### Cơ chế hoạt động của Regularization
+<img width="1418" height="787" alt="image" src="https://github.com/user-attachments/assets/4d0cde3b-68f6-45be-a997-fa6fd0d169a3" />
 
-1.  **Thêm Tham số Hình phạt vào Hàm Mất mát:**
-    Regularization hoạt động bằng cách thêm một số hạng hình phạt (penalty term) vào hàm mất mát ban đầu của mô hình. Hàm mất mát ban đầu (ví dụ: Sai số bình phương trung bình - MSE) đo lường mức độ khớp của mô hình với dữ liệu huấn luyện. Số hạng hình phạt này phụ thuộc vào độ lớn của các hệ số của mô hình.
-    *   Hàm mất mát mới = Hàm mất mát ban đầu + `λ * (số hạng hình phạt)`
-    *   `λ` (lambda) là **tham số sức mạnh chính quy hóa (regularization strength parameter)** có thể điều chỉnh được. Giá trị của `λ` quyết định mức độ ảnh hưởng của hình phạt.
-        *   `λ = 0`: Không có regularization, mô hình trở lại dạng ban đầu (ví dụ: hồi quy tuyến tính thông thường).
-        *   `λ` nhỏ: Hình phạt yếu, mô hình vẫn khá phức tạp.
-        *   `λ` lớn: Hình phạt mạnh, buộc các hệ số phải rất nhỏ hoặc bằng 0, làm mô hình đơn giản hơn.
+#### 1. Công thức và Ràng buộc Cốt lõi
 
-2.  **Lựa chọn Đặc trưng và Ngăn chặn Overfitting:**
-    Bằng cách "thu nhỏ" đóng góp của các đặc trưng (giảm độ lớn của hệ số), regularization gián tiếp thực hiện **lựa chọn đặc trưng (feature selection)**. Các đặc trưng ít quan trọng sẽ có hệ số bị giảm đáng kể, thậm chí về 0, làm cho chúng ít ảnh hưởng đến dự đoán. Quá trình này giúp mô hình tập trung vào các đặc trưng quan trọng hơn, từ đó ngăn chặn mô hình học thuộc lòng nhiễu trong dữ liệu huấn luyện.
+*   **Công thức:** `V = W x H`
+    *   Ý tưởng cơ bản là phân rã ma trận gốc `V` thành hai ma trận nhỏ hơn là `W` và `H`.
+*   **Ràng buộc chính:** Điểm khác biệt mấu chốt được nhấn mạnh ngay từ đầu: "tất cả ba ma trận phải chỉ có giá trị dương". Đây là ràng buộc "không âm" (non-negative) định nghĩa nên phương pháp NMF.
 
-#### Các Kỹ thuật Regularization chính
+#### 2. Phép tương tự trong Xử lý Ngôn ngữ Tự nhiên (NLP)
 
-Chúng ta sẽ xem xét kỹ hơn về Ridge, LASSO và Elastic Net:
+Hình ảnh minh họa một ứng dụng phổ biến của NMF trong NLP (mô hình hóa chủ đề):
 
-1.  **Ridge Regression (L2 Regularization):**
-    *   **Công thức hình phạt:** Trong Ridge Regression, số hạng hình phạt `λ` được áp dụng **tỷ lệ với bình phương của giá trị hệ số** (`sum of squared coefficients`). Cụ thể, nó là tổng bình phương của tất cả các hệ số (trừ hệ số chặn - intercept).
-    *   **Ảnh hưởng:**
-        *   **"Thu nhỏ" các hệ số:** Hình phạt này có tác dụng "thu nhỏ" các hệ số hồi quy về phía 0. Các hệ số lớn sẽ bị phạt nặng hơn.
-        *   **Bias và Variance:** Việc áp đặt hình phạt này tạo ra một độ lệch (bias) nhỏ vào mô hình (vì các hệ số không còn là ước lượng không thiên lệch của OLS). Tuy nhiên, đổi lại, nó **giảm đáng kể phương sai (variance)** của mô hình, giúp ngăn chặn overfitting.
-        *   **Không loại bỏ đặc trưng:** Ridge Regression buộc các hệ số phải nhỏ hơn, nhưng nó **không đặt hệ số bằng 0** (trừ trường hợp rất hiếm khi giá trị ban đầu đã là 0). Điều này có nghĩa là tất cả các đặc trưng ban đầu vẫn được giữ lại trong mô hình, chỉ là tầm ảnh hưởng của chúng bị giảm.
-    *   **Tối ưu `λ`:** Giá trị tốt nhất cho `λ` (regularization strength) được chọn thông qua các kỹ thuật như **kiểm định chéo (cross-validation)**. Chúng ta sẽ thử nghiệm các giá trị `λ` khác nhau và chọn giá trị mang lại hiệu suất tốt nhất trên tập xác thực.
-    *   **Thực hành tốt nhất:** Điều quan trọng là phải **chuẩn hóa (scale) các đặc trưng** (ví dụ: sử dụng `StandardScaler` trong Scikit-Learn) trước khi áp dụng Ridge Regression. Nếu không chuẩn hóa, các đặc trưng có thang đo lớn hơn sẽ bị phạt ít hơn một cách không công bằng so với các đặc trưng có thang đo nhỏ hơn, làm sai lệch hiệu quả của hình phạt.
+*   **`term-document matrix` (Ma trận từ-tài liệu):** Đây là ma trận đầu vào `V`, nơi mỗi hàng đại diện cho một từ (term) và mỗi cột đại diện cho một tài liệu (document).
+*   **`terms -> topics` (từ -> chủ đề):** Đây là ma trận `W`. Nó cho biết mối liên hệ giữa các từ và các chủ đề được trích xuất.
+*   **`topics -> docs` (chủ đề -> tài liệu):** Đây là ma trận `H`. Nó cho biết mức độ phân bổ của các chủ đề trong mỗi tài liệu.
 
-2.  **LASSO Regression (L1 Regularization - Least Absolute Shrinkage and Selection Operator):**
-    *   **Công thức hình phạt:** Trong LASSO Regression, hình phạt `λ` được áp dụng **tỷ lệ với giá trị tuyệt đối của các hệ số** (`sum of absolute coefficients`).
-    *   **Ảnh hưởng:**
-        *   **Thu nhỏ và lựa chọn đặc trưng:** Tương tự như Ridge, việc tăng `λ` trong LASSO cũng làm tăng bias và giảm variance. Tuy nhiên, điểm khác biệt cốt lõi là LASSO **có nhiều khả năng đặt các hệ số của các đặc trưng ít quan trọng về 0**. Điều này biến LASSO trở thành một công cụ hiệu quả để **lựa chọn đặc trưng**, giúp loại bỏ các đặc trưng không cần thiết và làm cho mô hình trở nên dễ giải thích hơn.
-        *   **Ưu điểm về diễn giải:** Đặc tính lựa chọn đặc trưng của LASSO mang lại lợi thế về khả năng diễn giải (interpretability). Khi một hệ số bằng 0, chúng ta có thể kết luận rằng đặc trưng tương ứng không đóng góp vào dự đoán của mô hình.
-        *   **Hạn chế:** Tuy nhiên, nếu biến mục tiêu thực sự phụ thuộc vào **nhiều đặc trưng** (ví dụ, tất cả các đặc trưng đều có một mức độ quan trọng nào đó), LASSO có thể hoạt động kém hơn Ridge vì nó có xu hướng loại bỏ một số đặc trưng hữu ích.
+Về cơ bản, NMF "học" các chủ đề tiềm ẩn bằng cách phân rã ma trận từ-tài liệu thành mối quan hệ giữa từ-chủ đề và chủ đề-tài liệu.
 
-3.  **Elastic Net Regression (L1 + L2 Regularization):**
-    *   **Công thức hình phạt:** Elastic Net là một phương pháp lai, kết hợp cả hai hình phạt từ Ridge (L2) và LASSO (L1). Hàm mất mát của nó bao gồm cả tổng bình phương của các hệ số và tổng giá trị tuyệt đối của các hệ số, mỗi phần được điều chỉnh bởi một trọng số.
-    *   **Tham số bổ sung:** Elastic Net yêu cầu điều chỉnh thêm một tham số, thường được ký hiệu là `α` (alpha), để xác định trọng số nhấn mạnh giữa hình phạt L1 và L2.
-        *   Nếu `α = 0`, Elastic Net trở thành Ridge Regression.
-        *   Nếu `α = 1`, Elastic Net trở thành LASSO Regression.
-        *   Nếu `0 < α < 1`, nó là sự kết hợp của cả hai.
-    *   **Ảnh hưởng:**
-        *   Kế thừa khả năng thu nhỏ hệ số của Ridge và khả năng lựa chọn đặc trưng của LASSO.
-        *   Đặc biệt hiệu quả trong các tình huống có **nhiều đặc trưng tương quan mạnh**. Khi có một nhóm các đặc trưng tương quan, LASSO có xu hướng chỉ chọn một trong số chúng và loại bỏ phần còn lại, trong khi Elastic Net có xu hướng chọn hoặc loại bỏ tất cả các đặc trưng trong nhóm đó cùng lúc. Điều này giúp ổn định hơn quá trình lựa chọn đặc trưng khi có các đặc trưng tương quan.
-        *   Là lựa chọn linh hoạt khi chúng ta không chắc chắn giữa việc sử dụng Ridge hay LASSO.
+#### 3. So sánh Trực quan: PCA và NMF trong Nhận dạng Khuôn mặt
 
-#### Các cách giải thích về Regularization
+Đây là phần sâu sắc nhất của hình ảnh, so sánh cách PCA và NMF phân rã một tập hợp các hình ảnh khuôn mặt.
 
-Các kỹ thuật regularization không chỉ có ý nghĩa về mặt toán học thông qua việc thêm số hạng vào hàm mất mát mà còn có các cách giải thích khác:
+*   **`Original` (Ảnh gốc):** Mục tiêu là tái tạo lại một hình ảnh khuôn mặt từ các thành phần đã học.
 
-*   **Giải thích hình học (Geometric Interpretation):** Có thể hình dung regularization như việc giới hạn không gian tìm kiếm các hệ số. Ví dụ, hình phạt L2 tương ứng với việc giới hạn các hệ số trong một hình cầu (sphere), trong khi hình phạt L1 tương ứng với một hình khối lập phương (diamond) trong không gian hệ số. Các "góc" của hình khối lập phương L1 chính là nơi các hệ số có xu hướng bằng 0.
-*   **Giải thích xác suất (Probabilistic Interpretation):** Regularization có thể được hiểu là việc áp đặt các phân phối ưu tiên (prior distributions) lên các hệ số của mô hình trong khuôn khổ Bayesian. Ví dụ, L2 regularization tương đương với việc giả định các hệ số tuân theo phân phối Gaussian (chuẩn) với giá trị trung bình bằng 0, trong khi L1 regularization tương ứng với phân phối Laplace.
+*   **Phân tích PCA:**
+    *   **Thành phần ("Eigenfaces"):** Các thành phần chính mà PCA trích xuất (lưới ảnh lớn bên trái) trông giống như các khuôn mặt ma quái, tổng thể. Chúng chứa cả giá trị dương (vùng sáng, đỏ) và giá trị âm (vùng tối, xanh). Chúng không đại diện cho các bộ phận cụ thể như mắt hay mũi.
+    *   **Tái tạo:** Khuôn mặt được tái tạo bằng cách kết hợp tuyến tính các "eigenfaces" này. Vì có cả giá trị âm và dương, quá trình này bao gồm cả việc "cộng" và "trừ" các mẫu khuôn mặt với nhau, khiến việc diễn giải trở nên khó khăn.
+
+*   **Phân tích NMF:**
+    *   **Thành phần (Parts-based):** Các thành phần mà NMF trích xuất (lưới ảnh lớn ở giữa) rất khác biệt. Chúng không phải là các khuôn mặt hoàn chỉnh mà là các **bộ phận cấu thành** của một khuôn mặt, chẳng hạn như lông mày, mũi, đường viền miệng, v.v.
+    *   **Tính không âm:** Quan trọng nhất, tất cả các thành phần này đều không âm (chỉ có các nét tối trên nền trắng).
+    *   **Tái tạo:** Khuôn mặt được tái tạo bằng cách **kết hợp cộng gộp (additive combination)** các bộ phận này lại với nhau. Ví dụ: `Khuôn mặt ≈ (hệ số A * thành phần lông mày) + (hệ số B * thành phần mũi) + ...`. Cách tiếp cận này tương tự như cách chúng ta nhận thức về một khuôn mặt: là sự kết hợp của các bộ phận riêng lẻ.
+
+*   Giá trị pixel của một hình ảnh (thường từ 0 đến 255).
+*   Các thuộc tính luôn dương, có thể bằng 0 hoặc lớn hơn (ví dụ: số lần xuất hiện của một từ).
+
+Trong trường hợp nhận dạng từ vựng, mỗi hàng trong ma trận có thể được coi là một tài liệu, trong khi mỗi cột có thể được coi là một chủ đề.
+
+#### Ứng dụng của NMF
+
+NMF đã chứng tỏ là một công cụ rất mạnh mẽ cho các lĩnh vực như:
+
+*   Nhận dạng từ và từ vựng
+*   Xử lý hình ảnh
+*   Khai phá văn bản (text mining) và mô hình hóa chủ đề (topic modeling)
+*   Phiên âm, mã hóa và giải mã
+*   Phân rã video, âm nhạc hoặc hình ảnh
+
+#### Ưu điểm và Nhược điểm
+
+Việc chỉ xử lý các giá trị không âm mang lại cả ưu điểm và nhược điểm.
+
+*   **Ưu điểm:** NMF tạo ra các đặc trưng có xu hướng **dễ diễn giải hơn**. Ví dụ, trong bài toán nhận dạng khuôn mặt, các thành phần được phân rã thường tương ứng với những thứ có thể hiểu được như mũi, lông mày hoặc miệng. Điều này là do các thành phần mang tính chất "cộng gộp" (additive) thay vì "trừ đi" như trong PCA.
+
+*   **Nhược điểm:** Để áp đặt ràng buộc chỉ có giá trị dương, NMF mặc định sẽ **cắt bỏ (truncate) các giá trị âm**. Quá trình cắt bỏ này có xu hướng làm mất nhiều thông tin hơn so với các phương pháp phân rã khác.
+
+Một điểm khác biệt nữa là NMF không bắt buộc các vector tiềm ẩn (latent vectors) phải trực giao với nhau (như trong PCA) và có thể tạo ra các vector chỉ về cùng một hướng.
+
+---
+
+### NMF cho Xử lý Ngôn ngữ Tự nhiên (NMF for NLP)
+
+Trong lĩnh vực Xử lý Ngôn ngữ Tự nhiên, NMF hoạt động như một công cụ tuyệt vời cho việc mô hình hóa chủ đề (topic modeling).
+
+#### Đầu vào (Inputs)
+
+Đầu vào cho NMF là dữ liệu văn bản đã được vector hóa. Thông thường, văn bản được tiền xử lý và chuyển đổi thành ma trận số bằng các kỹ thuật như **Count Vectorizer** hoặc, phổ biến hơn, là **Term Frequency - Inverse Document Frequency (TF-IDF)**. Ma trận TF-IDF là một ma trận không âm, rất phù hợp cho NMF.
+
+#### Tham số cần tinh chỉnh (Parameters to tune)
+
+Hai tham số chính cần được tinh chỉnh là:
+
+1.  **Số lượng chủ đề (Number of Topics):** Tương ứng với `n_components`, đây là số lượng chủ đề mà bạn muốn mô hình trích xuất từ kho văn bản.
+2.  **Tiền xử lý văn bản (Text Preprocessing):** Chất lượng của các chủ đề phụ thuộc rất nhiều vào cách bạn làm sạch và chuẩn bị dữ liệu văn bản (ví dụ: loại bỏ từ dừng (stop words), giới hạn tần suất xuất hiện tối thiểu/tối đa của từ, chỉ giữ lại một số loại từ nhất định như danh từ, động từ, v.v.).
+
+#### Đầu ra (Output)
+
+Đầu ra của NMF sẽ là hai ma trận:
+
+*   **Ma trận W:** Cho chúng ta biết mối quan hệ giữa các **thuật ngữ (terms/words)** với các **chủ đề (topics)** khác nhau. Mỗi cột của W đại diện cho một chủ đề, và các giá trị trong cột đó cho biết tầm quan trọng của mỗi từ đối với chủ đề đó.
+*   **Ma trận H:** Cho chúng ta biết cách sử dụng các chủ đề đó để **tái tạo lại các tài liệu (documents)** ban đầu. Mỗi cột của H đại diện cho một tài liệu, và các giá trị trong cột đó cho biết mức độ "hiện diện" của mỗi chủ đề trong tài liệu đó.
+
+---
+
+### Cú pháp (Syntax) trong `scikit-learn`
+
+Cú pháp bao gồm việc import lớp chứa phương pháp phân cụm:
+
+```python
+from sklearn.decomposition import NMF
+```
+
+Tạo một thực thể (instance) của lớp:
+
+```python
+# Tạo một mô hình NMF để tìm 3 chủ đề (hoặc thành phần)
+# init='random' chỉ định phương pháp khởi tạo ngẫu nhiên cho W và H
+nmf = NMF(n_components=3, init='random', random_state=0)
+```
+
+Huấn luyện mô hình và tạo ra phiên bản dữ liệu đã được biến đổi (chính là ma trận H):
+
+```python
+# Giả sử X là ma trận TF-IDF của bạn
+# fit_transform sẽ huấn luyện mô hình và trả về ma trận H
+W = nmf.fit_transform(X)
+
+# Ma trận W có thể được truy cập thông qua thuộc tính components_
+H = nmf.components_
+```
