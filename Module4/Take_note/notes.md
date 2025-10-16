@@ -4,20 +4,14 @@ Khi làm việc với dữ liệu, đặc biệt là các bộ dữ liệu lớn
 
 May mắn là trong nhiều trường hợp, dữ liệu có thể được biểu diễn một cách hiệu quả bằng một số lượng chiều (đặc trưng) ít hơn mà vẫn giữ được phần lớn thông tin quan trọng. Có hai phương pháp chính để giảm chiều dữ liệu:
 
-<img width="803" height="535" alt="image" src="https://github.com/user-attachments/assets/c2396058-fb43-45a5-af28-9cd96c629660" />
-
 1.  **Lựa chọn đặc trưng (Feature Selection):** Chọn ra một tập hợp con các đặc trưng "quan trọng" nhất từ bộ đặc trưng ban đầu và loại bỏ các đặc trưng còn lại.
-<img width="794" height="576" alt="image" src="https://github.com/user-attachments/assets/fc5f334d-6b6b-4a31-8eeb-db28475424ce" />
-
 2.  **Trích xuất đặc trưng (Feature Extraction):** Tạo ra các đặc trưng mới bằng cách kết hợp các đặc trưng ban đầu thông qua các phép biến đổi tuyến tính hoặc phi tuyến. Các đặc trưng mới này thường ít hơn về số lượng nhưng cô đọng được nhiều thông tin hơn. **PCA** là một kỹ thuật thuộc nhóm này.
-<img width="809" height="550" alt="image" src="https://github.com/user-attachments/assets/91bc73d5-a595-46cf-b429-aed1a34864a0" />
-
 ---
 
 ### Phân tích thành phần chính (Principal Component Analysis - PCA)
 
 **PCA** là một kỹ thuật giảm chiều dữ liệu phổ biến, hoạt động bằng cách tạo ra các đặc trưng mới thông qua việc áp dụng các phép biến đổi tuyến tính trên sự kết hợp của các đặc trưng ban đầu. Các đặc trưng mới này được gọi là **các thành phần chính (principal components)**, và dữ liệu ban đầu sẽ được "chiếu" lên không gian của các thành phần chính này.
-
+<img width="1305" height="789" alt="image" src="https://github.com/user-attachments/assets/298c209f-12ac-4fb7-83af-d2df2955190e" />
 #### Các đặc tính chính của PCA:
 
 *   **Tuyến tính:** Mỗi thành phần chính là một tổ hợp tuyến tính của các đặc trưng gốc.
@@ -25,6 +19,7 @@ May mắn là trong nhiều trường hợp, dữ liệu có thể được bi�
 *   **Thứ tự quan trọng:** Mức độ quan trọng của mỗi thành phần chính được xác định bởi lượng phương sai (variance) của dữ liệu gốc mà nó giải thích/bảo toàn được.
     *   Thành phần chính thứ nhất (PC1) được chọn để giải thích được nhiều phương sai nhất.
     *   Thành phần chính thứ hai (PC2), trực giao với PC1, được chọn để giải thích phần phương sai còn lại lớn nhất, và cứ tiếp tục như vậy.
+
 
 #### Cơ sở toán học: SVD
 
