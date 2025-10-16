@@ -43,8 +43,8 @@ K-Means rất nhạy cảm với việc lựa chọn các điểm khởi tạo b
 
 ### Công thức
 Xác suất để chọn một điểm làm tâm cụm tiếp theo được tính như sau:
-<img width="438" height="148" alt="image" src="https://github.com/user-attachments/assets/621b8e37-3d95-400f-8486-5621914c1472" />
-Trong đó, $D(\text{điểm}_i)$ là khoảng cách từ điểm *i* đến tâm cụm gần nhất đã được chọn.
+*  <img width="438" height="148" alt="image" src="https://github.com/user-attachments/assets/621b8e37-3d95-400f-8486-5621914c1472" />
+*  Trong đó, $D(\text{điểm}_i)$ là khoảng cách từ điểm *i* đến tâm cụm gần nhất đã được chọn.
 
 ---
 
