@@ -1,56 +1,92 @@
-###  Các Kỹ thuật Regularization
+Tất nhiên rồi. Dựa trên thông tin bạn cung cấp, đây là bản giải thích chi tiết và đầy đủ về hai kỹ thuật giảm chiều dữ liệu nâng cao là Kernel PCA và MDS, được trình bày bằng tiếng Việt dưới dạng Markdown.
 
-Để xây dựng một mô hình học máy hiệu quả, chúng ta phải đối mặt với ba nguồn sai số chính: **bias (độ lệch)**, **variance (phương sai)** và **irreducible error (sai số không thể giảm)**. Sai số không thể giảm là nhiễu vốn có trong dữ liệu mà không mô hình nào có thể loại bỏ. Tuy nhiên, bias và variance là hai thành phần mà chúng ta có thể tối ưu hóa thông qua việc thiết kế và huấn luyện mô hình.
+---
 
-**Regularization (Chính quy hóa)** là một kỹ thuật mạnh mẽ và thiết yếu trong học máy, đặc biệt là trong các mô hình hồi quy và mạng nơ-ron, nhằm đạt được mục tiêu xây dựng các mô hình đơn giản hơn nhưng với sai số tương đối thấp. Mục tiêu chính của regularization là **tránh hiện tượng overfitting (quá khớp)** bằng cách đưa một "hình phạt" vào hàm mất mát (cost function) của mô hình. Hình phạt này khuyến khích mô hình sử dụng các hệ số (coefficients) có giá trị nhỏ hơn, từ đó giảm độ phức tạp của mô hình và "thu nhỏ" kích thước của nó (shrinks the model).
+Trong phần này, chúng ta sẽ tìm hiểu về hai kỹ thuật giảm chiều dữ liệu nâng cao, là những phương pháp mạnh mẽ khi mối quan hệ trong dữ liệu không phải là tuyến tính.
 
-#### Cơ chế hoạt động của Regularization
+### 1. Phân tích Thành phần chính Hạt nhân (Kernel Principal Component Analysis - Kernel PCA)
 
-1.  **Thêm Tham số Hình phạt vào Hàm Mất mát:**
-    Regularization hoạt động bằng cách thêm một số hạng hình phạt (penalty term) vào hàm mất mát ban đầu của mô hình. Hàm mất mát ban đầu (ví dụ: Sai số bình phương trung bình - MSE) đo lường mức độ khớp của mô hình với dữ liệu huấn luyện. Số hạng hình phạt này phụ thuộc vào độ lớn của các hệ số của mô hình.
-    *   Hàm mất mát mới = Hàm mất mát ban đầu + `λ * (số hạng hình phạt)`
-    *   `λ` (lambda) là **tham số sức mạnh chính quy hóa (regularization strength parameter)** có thể điều chỉnh được. Giá trị của `λ` quyết định mức độ ảnh hưởng của hình phạt.
-        *   `λ = 0`: Không có regularization, mô hình trở lại dạng ban đầu (ví dụ: hồi quy tuyến tính thông thường).
-        *   `λ` nhỏ: Hình phạt yếu, mô hình vẫn khá phức tạp.
-        *   `λ` lớn: Hình phạt mạnh, buộc các hệ số phải rất nhỏ hoặc bằng 0, làm mô hình đơn giản hơn.
+**Kernel PCA** là một phiên bản mở rộng của Phân tích Thành phần chính (PCA) tiêu chuẩn, sử dụng các kỹ thuật của **phương pháp hạt nhân (kernel methods)**. Ý tưởng cốt lõi là khi dữ liệu không thể phân tách một cách tuyến tính trong không gian ban đầu, chúng ta có thể ánh xạ nó lên một không gian có số chiều cao hơn, nơi nó có thể trở nên tuyến tính.
 
-2.  **Lựa chọn Đặc trưng và Ngăn chặn Overfitting:**
-    Bằng cách "thu nhỏ" đóng góp của các đặc trưng (giảm độ lớn của hệ số), regularization gián tiếp thực hiện **lựa chọn đặc trưng (feature selection)**. Các đặc trưng ít quan trọng sẽ có hệ số bị giảm đáng kể, thậm chí về 0, làm cho chúng ít ảnh hưởng đến dự đoán. Quá trình này giúp mô hình tập trung vào các đặc trưng quan trọng hơn, từ đó ngăn chặn mô hình học thuộc lòng nhiễu trong dữ liệu huấn luyện.
+Kernel PCA thực hiện điều này một cách hiệu quả bằng cách sử dụng "thủ thuật hạt nhân" (kernel trick), cho phép chúng ta tính toán trong không gian chiều cao đó mà không cần thực sự biến đổi dữ liệu một cách tường minh, giúp tiết kiệm chi phí tính toán.
 
-#### Các Kỹ thuật Regularization chính
+#### Các loại hạt nhân (Kernels) phổ biến:
 
-Chúng ta sẽ xem xét kỹ hơn về Ridge, LASSO và Elastic Net:
+Kernel PCA ánh xạ dữ liệu lên một không gian chiều cao hơn bằng cách sử dụng các hàm hạt nhân. Mỗi loại hạt nhân phù hợp với các loại cấu trúc dữ liệu khác nhau:
 
-1.  **Ridge Regression (L2 Regularization):**
-    *   **Công thức hình phạt:** Trong Ridge Regression, số hạng hình phạt `λ` được áp dụng **tỷ lệ với bình phương của giá trị hệ số** (`sum of squared coefficients`). Cụ thể, nó là tổng bình phương của tất cả các hệ số (trừ hệ số chặn - intercept).
-    *   **Ảnh hưởng:**
-        *   **"Thu nhỏ" các hệ số:** Hình phạt này có tác dụng "thu nhỏ" các hệ số hồi quy về phía 0. Các hệ số lớn sẽ bị phạt nặng hơn.
-        *   **Bias và Variance:** Việc áp đặt hình phạt này tạo ra một độ lệch (bias) nhỏ vào mô hình (vì các hệ số không còn là ước lượng không thiên lệch của OLS). Tuy nhiên, đổi lại, nó **giảm đáng kể phương sai (variance)** của mô hình, giúp ngăn chặn overfitting.
-        *   **Không loại bỏ đặc trưng:** Ridge Regression buộc các hệ số phải nhỏ hơn, nhưng nó **không đặt hệ số bằng 0** (trừ trường hợp rất hiếm khi giá trị ban đầu đã là 0). Điều này có nghĩa là tất cả các đặc trưng ban đầu vẫn được giữ lại trong mô hình, chỉ là tầm ảnh hưởng của chúng bị giảm.
-    *   **Tối ưu `λ`:** Giá trị tốt nhất cho `λ` (regularization strength) được chọn thông qua các kỹ thuật như **kiểm định chéo (cross-validation)**. Chúng ta sẽ thử nghiệm các giá trị `λ` khác nhau và chọn giá trị mang lại hiệu suất tốt nhất trên tập xác thực.
-    *   **Thực hành tốt nhất:** Điều quan trọng là phải **chuẩn hóa (scale) các đặc trưng** (ví dụ: sử dụng `StandardScaler` trong Scikit-Learn) trước khi áp dụng Ridge Regression. Nếu không chuẩn hóa, các đặc trưng có thang đo lớn hơn sẽ bị phạt ít hơn một cách không công bằng so với các đặc trưng có thang đo nhỏ hơn, làm sai lệch hiệu quả của hình phạt.
+*   **`linear`**: Hạt nhân tuyến tính. Sử dụng hạt nhân này sẽ cho kết quả tương tự như PCA tiêu chuẩn.
+*   **`poly`**: Hạt nhân đa thức (polynomial), hữu ích cho dữ liệu có cấu trúc dạng cong đa thức.
+*   **`rbf`**: Hạt nhân hàm cơ sở bán kính (Radial Basis Function), là một lựa chọn rất linh hoạt và phổ biến, có thể xử lý các mối quan hệ phi tuyến rất phức tạp.
+*   **`sigmoid`**: Hạt nhân Sigmoid, thường được sử dụng trong lĩnh vực mạng nơ-ron.
+*   **`cosine`**: Hạt nhân Cosine, đo lường sự tương đồng dựa trên góc, hữu ích cho dữ liệu văn bản.
 
-2.  **LASSO Regression (L1 Regularization - Least Absolute Shrinkage and Selection Operator):**
-    *   **Công thức hình phạt:** Trong LASSO Regression, hình phạt `λ` được áp dụng **tỷ lệ với giá trị tuyệt đối của các hệ số** (`sum of absolute coefficients`).
-    *   **Ảnh hưởng:**
-        *   **Thu nhỏ và lựa chọn đặc trưng:** Tương tự như Ridge, việc tăng `λ` trong LASSO cũng làm tăng bias và giảm variance. Tuy nhiên, điểm khác biệt cốt lõi là LASSO **có nhiều khả năng đặt các hệ số của các đặc trưng ít quan trọng về 0**. Điều này biến LASSO trở thành một công cụ hiệu quả để **lựa chọn đặc trưng**, giúp loại bỏ các đặc trưng không cần thiết và làm cho mô hình trở nên dễ giải thích hơn.
-        *   **Ưu điểm về diễn giải:** Đặc tính lựa chọn đặc trưng của LASSO mang lại lợi thế về khả năng diễn giải (interpretability). Khi một hệ số bằng 0, chúng ta có thể kết luận rằng đặc trưng tương ứng không đóng góp vào dự đoán của mô hình.
-        *   **Hạn chế:** Tuy nhiên, nếu biến mục tiêu thực sự phụ thuộc vào **nhiều đặc trưng** (ví dụ, tất cả các đặc trưng đều có một mức độ quan trọng nào đó), LASSO có thể hoạt động kém hơn Ridge vì nó có xu hướng loại bỏ một số đặc trưng hữu ích.
+#### Các điểm khác biệt chính so với PCA:
 
-3.  **Elastic Net Regression (L1 + L2 Regularization):**
-    *   **Công thức hình phạt:** Elastic Net là một phương pháp lai, kết hợp cả hai hình phạt từ Ridge (L2) và LASSO (L1). Hàm mất mát của nó bao gồm cả tổng bình phương của các hệ số và tổng giá trị tuyệt đối của các hệ số, mỗi phần được điều chỉnh bởi một trọng số.
-    *   **Tham số bổ sung:** Elastic Net yêu cầu điều chỉnh thêm một tham số, thường được ký hiệu là `α` (alpha), để xác định trọng số nhấn mạnh giữa hình phạt L1 và L2.
-        *   Nếu `α = 0`, Elastic Net trở thành Ridge Regression.
-        *   Nếu `α = 1`, Elastic Net trở thành LASSO Regression.
-        *   Nếu `0 < α < 1`, nó là sự kết hợp của cả hai.
-    *   **Ảnh hưởng:**
-        *   Kế thừa khả năng thu nhỏ hệ số của Ridge và khả năng lựa chọn đặc trưng của LASSO.
-        *   Đặc biệt hiệu quả trong các tình huống có **nhiều đặc trưng tương quan mạnh**. Khi có một nhóm các đặc trưng tương quan, LASSO có xu hướng chỉ chọn một trong số chúng và loại bỏ phần còn lại, trong khi Elastic Net có xu hướng chọn hoặc loại bỏ tất cả các đặc trưng trong nhóm đó cùng lúc. Điều này giúp ổn định hơn quá trình lựa chọn đặc trưng khi có các đặc trưng tương quan.
-        *   Là lựa chọn linh hoạt khi chúng ta không chắc chắn giữa việc sử dụng Ridge hay LASSO.
+*   **Khả năng tái tạo (Reconstruction):** Không giống như PCA tiêu chuẩn, Kernel PCA có thể không cho phép tái tạo lại dữ liệu gốc một cách hoàn hảo từ dữ liệu đã giảm chiều.
+*   **Nhiều tham số tự do hơn:** Kernel PCA có thêm các siêu tham số cần phải tinh chỉnh, chẳng hạn như:
+    *   **`gamma`**: Tham số của các hạt nhân như `rbf` và `poly`, kiểm soát mức độ ảnh hưởng của một điểm dữ liệu.
+    *   **`alpha`**: Tham số điều chuẩn (regularization parameter).
 
-#### Các cách giải thích về Regularization
+#### Cú pháp (Syntax) trong `scikit-learn`
 
-Các kỹ thuật regularization không chỉ có ý nghĩa về mặt toán học thông qua việc thêm số hạng vào hàm mất mát mà còn có các cách giải thích khác:
+Đây là một ví dụ về cách tạo một đối tượng Kernel PCA:
 
-*   **Giải thích hình học (Geometric Interpretation):** Có thể hình dung regularization như việc giới hạn không gian tìm kiếm các hệ số. Ví dụ, hình phạt L2 tương ứng với việc giới hạn các hệ số trong một hình cầu (sphere), trong khi hình phạt L1 tương ứng với một hình khối lập phương (diamond) trong không gian hệ số. Các "góc" của hình khối lập phương L1 chính là nơi các hệ số có xu hướng bằng 0.
-*   **Giải thích xác suất (Probabilistic Interpretation):** Regularization có thể được hiểu là việc áp đặt các phân phối ưu tiên (prior distributions) lên các hệ số của mô hình trong khuôn khổ Bayesian. Ví dụ, L2 regularization tương đương với việc giả định các hệ số tuân theo phân phối Gaussian (chuẩn) với giá trị trung bình bằng 0, trong khi L1 regularization tương ứng với phân phối Laplace.
+```python
+from sklearn.decomposition import KernelPCA
+
+# Tạo một thực thể của lớp KernelPCA
+# - kernel="rbf": Sử dụng hạt nhân RBF, rất mạnh cho các cấu trúc phức tạp.
+# - gamma=10: Tham số cho hạt nhân RBF.
+# - fit_inverse_transform=True: Cho phép thử tái tạo lại dữ liệu gốc (lưu ý đây chỉ là phép xấp xỉ).
+# - alpha=0.1: Tham số điều chuẩn.
+kernel_pca = KernelPCA(kernel="rbf", gamma=10, fit_inverse_transform=True, alpha=0.1)
+```
+
+Chúng ta có thể huấn luyện mô hình và biến đổi dữ liệu:
+
+```python
+# Huấn luyện mô hình trên dữ liệu huấn luyện
+kernel_pca.fit(X_train)
+
+# Áp dụng phép biến đổi đã học lên dữ liệu kiểm thử
+X_test_kernel_pca = kernel_pca.transform(X_test)
+```
+
+---
+
+### 2. Định tỷ lệ Đa chiều (Multi-Dimensional Scaling - MDS)
+
+**Multi-Dimensional Scaling (MDS)** là một họ các thuật toán được thiết kế để trực quan hóa dữ liệu bằng cách bảo toàn sự "không tương đồng" (dissimilarity) hay khoảng cách giữa các cặp điểm. PCA có thể được coi là một trường hợp đặc biệt của MDS.
+
+Giống như PCA, MDS có thể được sử dụng để giảm chiều dữ liệu. Tuy nhiên, điểm khác biệt cốt lõi là:
+
+*   **PCA** cố gắng **tối đa hóa phương sai** được giữ lại.
+*   **MDS** cố gắng **bảo toàn khoảng cách** (hoặc sự không tương đồng) giữa các điểm.
+
+Mục tiêu của MDS là tìm một cấu hình các điểm trong không gian có số chiều thấp (thường là 2D hoặc 3D để trực quan hóa) sao cho khoảng cách giữa chúng trong không gian mới này phản ánh chính xác nhất khoảng cách trong không gian ban đầu. Có nhiều loại thước đo khoảng cách, được gọi là **chỉ số không tương đồng (dissimilarity metrics)**.
+<img width="1299" height="789" alt="image" src="https://github.com/user-attachments/assets/dbde7538-49da-4043-8465-7c98ad58c663" />
+
+
+#### Metric MDS
+
+**Metric MDS** tìm cách biểu diễn các điểm trong một không gian nhúng (embedding). Nó xác định các vị trí nhúng này bằng cách tối thiểu hóa sự khác biệt giữa khoảng cách ban đầu và khoảng cách trong không gian mới. Nó cố gắng bảo toàn giá trị thực của khoảng cách.
+
+#### Non-Metric MDS
+
+Trong **Non-Metric MDS**, chúng ta áp dụng một hàm `f(.)` lên chỉ số khoảng cách trước khi tối thiểu hóa nó. Điều này có nghĩa là Non-Metric MDS linh hoạt hơn: nó không cố gắng bảo toàn giá trị chính xác của khoảng cách mà chỉ cần **bảo toàn thứ tự** của chúng. Ví dụ, nếu điểm A gần điểm B hơn điểm C trong không gian gốc, thì trong không gian mới, điều này cũng phải đúng.
+
+#### Cú pháp (Syntax) trong `scikit-learn`
+
+Chúng ta có thể tạo một đối tượng MDS như sau:
+
+```python
+from sklearn.manifold import MDS
+
+# Tạo một thực thể của lớp MDS
+# - n_components=2: Giảm chiều dữ liệu xuống còn 2 chiều (để vẽ đồ thị).
+# - metric=False: Sử dụng Non-Metric MDS. Nếu True, sẽ là Metric MDS.
+# - dissimilarity='precomputed': Chỉ định rằng dữ liệu đầu vào (khi fit) đã là một ma trận khoảng cách.
+#   Nếu là 'euclidean', nó sẽ tự tính khoảng cách Euclid từ dữ liệu đặc trưng.
+# - random_state=0: Để đảm bảo kết quả có thể tái lập.
+embedding = MDS(n_components=2, metric=False, dissimilarity='precomputed', random_state=0)
+```
